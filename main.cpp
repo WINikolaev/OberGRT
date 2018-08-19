@@ -4,10 +4,10 @@ void _ADC_setup(void);
 void _Clock_setup(void);
 
 
-unsigned int A3 = 0x0000;
-unsigned int A4 = 0x0000;
-unsigned int A5 = 0x0000;
-unsigned int A6 = 0x0000; 
+uint16_t A3 = 0x0000;
+uint16_t A4 = 0x0000;
+uint16_t A5 = 0x0000;
+uint16_t A6 = 0x0000; 
 
 
 void main()

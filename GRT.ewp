@@ -256,10 +256,10 @@
                 </option>
                 <option>
                     <name>CCIncludePath2</name>
-                    <state>D:\forOber\GRT_1</state>
-                    <state>D:\forOber\GRT_1\STM8S_StdPeriph_Driver</state>
-                    <state>D:\forOber\GRT_1\STM8S_StdPeriph_Driver\inc</state>
-                    <state>D:\forOber\GRT_1\STM8S_StdPeriph_Driver\src</state>
+                    <state>D:\forOber\OberGRT</state>
+                    <state>D:\forOber\OberGRT\STM8S_StdPeriph_Driver</state>
+                    <state>D:\forOber\OberGRT\STM8S_StdPeriph_Driver\inc</state>
+                    <state>D:\forOber\OberGRT\STM8S_StdPeriph_Driver\src</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>

@@ -1,14 +1,14 @@
-"D:\forOber\GRT_1\STM8S_StdPeriph_Driver\src\stm8s_wwdg.c"
+"D:\forOber\OberGRT\STM8S_StdPeriph_Driver\src\stm8s_wwdg.c"
 -std=c++98
 -ferror-limit=0
 -I
-D:\forOber\GRT_1
+D:\forOber\OberGRT
 -I
-D:\forOber\GRT_1\STM8S_StdPeriph_Driver
+D:\forOber\OberGRT\STM8S_StdPeriph_Driver
 -I
-D:\forOber\GRT_1\STM8S_StdPeriph_Driver\inc
+D:\forOber\OberGRT\STM8S_StdPeriph_Driver\inc
 -I
-D:\forOber\GRT_1\STM8S_StdPeriph_Driver\src
+D:\forOber\OberGRT\STM8S_StdPeriph_Driver\src
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\stm8\inc
 -I
@@ -16,13 +16,13 @@ C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\stm8\inc\c
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\stm8\inc\ecpp
 -I
-D:\forOber\GRT_1
+D:\forOber\OberGRT
 -I
-D:\forOber\GRT_1\STM8S_StdPeriph_Driver
+D:\forOber\OberGRT\STM8S_StdPeriph_Driver
 -I
-D:\forOber\GRT_1\STM8S_StdPeriph_Driver\inc
+D:\forOber\OberGRT\STM8S_StdPeriph_Driver\inc
 -I
-D:\forOber\GRT_1\STM8S_StdPeriph_Driver\src
+D:\forOber\OberGRT\STM8S_StdPeriph_Driver\src
 -D__CHAR_BITS__=8
 -D__CHAR_MAX__=0xff
 -D__CHAR_MIN__=0
