@@ -2,7 +2,11 @@
 
 void _ADC_setup(void);
 void _Clock_setup(void);
+void _TIM1_Setup(void);
 void _WWDG_setup(void);
+
+
+
 
 uint16_t A3 = 0x0000;
 uint16_t A4 = 0x0000;
@@ -14,6 +18,7 @@ void main()
   
   _Clock_setup();
   _ADC_setup();
+  _TIM1_Setup();
   
   GPIO_Init(GPIOB, GPIO_PIN_5,GPIO_MODE_OUT_OD_HIZ_SLOW);
   GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
@@ -69,20 +74,34 @@ void _Clock_setup(void)
        CLK_HSECmd(DISABLE);
        CLK_LSICmd(DISABLE);
        CLK_HSICmd(ENABLE);
+       CLK_CCOCmd(ENABLE);
+       CLK_CCOConfig(CLK_OUTPUT_CPU);
+
        while(CLK_GetFlagStatus(CLK_FLAG_HSIRDY) == FALSE);
        CLK_ClockSwitchCmd(ENABLE);
-       CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV4);
-       CLK_SYSCLKConfig(CLK_PRESCALER_CPUDIV1);
-       CLK_ClockSwitchConfig(CLK_SWITCHMODE_AUTO, CLK_SOURCE_HSI,
-       DISABLE, CLK_CURRENTCLOCKSTATE_ENABLE);
+       
+       CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV8); 
+       
+       //CLK_SYSCLKConfig(CLK_PRESCALER_CPUDIV16);  
+       
+       
+       
+       CLK_ClockSwitchConfig(CLK_SWITCHMODE_AUTO, 
+                             CLK_SOURCE_HSI,
+                             DISABLE,
+                             CLK_CURRENTCLOCKSTATE_ENABLE);
+       
+       
+       
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_I2C, DISABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_ADC, ENABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_SPI, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_AWU, ENABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_UART1, ENABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER1, DISABLE);
+       CLK_PeripheralClockConfig(CLK_PERIPHERAL_AWU, DISABLE);
+       CLK_PeripheralClockConfig(CLK_PERIPHERAL_UART1, DISABLE);
+       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER1, ENABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER2, DISABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER4, DISABLE);
+
 }
 
 void _ADC_setup(void)
@@ -130,4 +149,10 @@ void _ADC_setup(void)
         ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE, (ADC1_Channel_TypeDef)(ADC1_CHANNEL_3 | ADC1_CHANNEL_4 | ADC1_CHANNEL_5 | ADC1_CHANNEL_6), ADC1_ALIGN_RIGHT);
         ADC1_DataBufferCmd(ENABLE);
         ADC1_Cmd(ENABLE);
+}
+
+void _TIM1_Setup(void)
+{
+  TIM1_DeInit();
+  
 }
