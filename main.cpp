@@ -1,9 +1,36 @@
 #include "stm8s.h"
 
+
+bool test = false;
+#pragma vector = ITC_IRQ_TIM4_OVF
+__interrupt void ITC_IRQ_TIM4_OVF_vect(void)
+{
+       if(test){
+        GPIO_WriteLow(GPIOB, GPIO_PIN_5);
+        test = false;
+      }else{
+        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
+        test = true;
+      }
+}
+/*
+void TIM4_UPD_OVF_IRQHandler(void)
+{
+       if(test){
+        GPIO_WriteLow(GPIOB, GPIO_PIN_5);
+        test = false;
+      }else{
+        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
+        test = true;
+      }
+
+}
+ */
+
 void _ADC_setup(void);
 void _Clock_setup(void);
-void _TIM1_Setup(void);
-void _WWDG_setup(void);
+void _TIM4_Setup(void);
+void _IWDG_setup(void);
 
 
 
@@ -18,21 +45,22 @@ void main()
   
   _Clock_setup();
   _ADC_setup();
-  _TIM1_Setup();
+  _TIM4_Setup();
+  _IWDG_setup();
+  
+  
+  
   
   GPIO_Init(GPIOB, GPIO_PIN_5,GPIO_MODE_OUT_OD_HIZ_SLOW);
   GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-  /// IWDG 
-  IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-  IWDG_SetPrescaler(IWDG_Prescaler_256);
-  IWDG_SetReload(0xFF);
-  IWDG_Enable();
+  
   
   bool ADC_StartConversion = false;
-  
+  enableInterrupts();
   while(1)
   {
     IWDG_ReloadCounter();
+    
     if(!ADC_StartConversion)
     {
       ADC1_ScanModeCmd(ENABLE);
@@ -49,15 +77,15 @@ void main()
       A5 = ADC1_GetBufferValue(5);
       A4 = ADC1_GetBufferValue(4);
       A3 = ADC1_GetBufferValue(3);
-      
+      /*
       if(A4 > 500){
         GPIO_WriteLow(GPIOB, GPIO_PIN_5);
         
       }else{
         GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-      }
+      }*/
     }
-    
+    IWDG_ReloadCounter();
    }
 }
 
@@ -74,8 +102,8 @@ void _Clock_setup(void)
        CLK_HSECmd(DISABLE);
        CLK_LSICmd(DISABLE);
        CLK_HSICmd(ENABLE);
-       CLK_CCOCmd(ENABLE);
-       CLK_CCOConfig(CLK_OUTPUT_CPU);
+       //CLK_CCOCmd(ENABLE);
+       //CLK_CCOConfig(CLK_OUTPUT_CPU);
 
        while(CLK_GetFlagStatus(CLK_FLAG_HSIRDY) == FALSE);
        CLK_ClockSwitchCmd(ENABLE);
@@ -98,9 +126,9 @@ void _Clock_setup(void)
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_SPI, DISABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_AWU, DISABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_UART1, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER1, ENABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER2, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER4, DISABLE);
+       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER1, DISABLE);
+       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER2, ENABLE);
+       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER4, ENABLE);
 
 }
 
@@ -151,8 +179,33 @@ void _ADC_setup(void)
         ADC1_Cmd(ENABLE);
 }
 
-void _TIM1_Setup(void)
+void _IWDG_setup(void)
 {
-  TIM1_DeInit();
+/// IWDG 
+  IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+  IWDG_SetPrescaler(IWDG_Prescaler_256);
+  IWDG_SetReload(0xFF);
+  IWDG_Enable();
+
+}
+
+
+
+void _TIM4_Setup(void)
+{
+  TIM4_DeInit();
   
+  //TIM4_ARRPreloadConfig(ENABLE);
+  
+  //TIM4_TimeBaseInit(TIM4_PRESCALER_128, 0xFF);
+ 
+  //TIM4_ITConfig(TIM4_IT_UPDATE, ENABLE);  
+  //TIM4_Cmd(ENABLE);
+  
+  
+  ///TIM2
+  TIM2_DeInit();
+  TIM2_TimeBaseInit(TIM2_PRESCALER_128, 0xFF);
+  TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
+  TIM2_Cmd(ENABLE);
 }

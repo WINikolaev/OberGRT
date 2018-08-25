@@ -1,4 +1,4 @@
-"D:\forOber\OberGRT\STM8S_StdPeriph_Driver\src\stm8s_tim4.c"
+"D:\forOber\OberGRT\STM8S_StdPeriph_Driver\stm8s_it.c"
 -std=c++98
 -ferror-limit=0
 -I

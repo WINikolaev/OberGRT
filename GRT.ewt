@@ -2130,6 +2130,9 @@
             <name>$PROJ_DIR$\STM8S_StdPeriph_Driver\src\stm8s_i2c.c</name>
         </file>
         <file>
+            <name>$PROJ_DIR$\STM8S_StdPeriph_Driver\stm8s_it.c</name>
+        </file>
+        <file>
             <name>$PROJ_DIR$\STM8S_StdPeriph_Driver\src\stm8s_itc.c</name>
         </file>
         <file>
