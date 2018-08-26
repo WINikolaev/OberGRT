@@ -1,35 +1,9 @@
 #include "stm8s.h"
 
 
-bool test = false;
-#pragma vector = ITC_IRQ_TIM4_OVF
-__interrupt void ITC_IRQ_TIM4_OVF_vect(void)
-{
-       if(test){
-        GPIO_WriteLow(GPIOB, GPIO_PIN_5);
-        test = false;
-      }else{
-        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-        test = true;
-      }
-}
-/*
-void TIM4_UPD_OVF_IRQHandler(void)
-{
-       if(test){
-        GPIO_WriteLow(GPIOB, GPIO_PIN_5);
-        test = false;
-      }else{
-        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-        test = true;
-      }
-
-}
- */
-
 void _ADC_setup(void);
 void _Clock_setup(void);
-void _TIM4_Setup(void);
+void _TIM2_Setup(void);
 void _IWDG_setup(void);
 
 
@@ -45,15 +19,11 @@ void main()
   
   _Clock_setup();
   _ADC_setup();
-  _TIM4_Setup();
+  _TIM2_Setup();
   _IWDG_setup();
-  
-  
-  
-  
+    
   GPIO_Init(GPIOB, GPIO_PIN_5,GPIO_MODE_OUT_OD_HIZ_SLOW);
   GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-  
   
   bool ADC_StartConversion = false;
   enableInterrupts();
@@ -103,24 +73,14 @@ void _Clock_setup(void)
        CLK_LSICmd(DISABLE);
        CLK_HSICmd(ENABLE);
        //CLK_CCOCmd(ENABLE);
-       //CLK_CCOConfig(CLK_OUTPUT_CPU);
-
+       //CLK_CCOConfig(CLK_OUTPUT_MASTER);
        while(CLK_GetFlagStatus(CLK_FLAG_HSIRDY) == FALSE);
        CLK_ClockSwitchCmd(ENABLE);
-       
-       CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV8); 
-       
-       //CLK_SYSCLKConfig(CLK_PRESCALER_CPUDIV16);  
-       
-       
-       
+       CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV8);     
        CLK_ClockSwitchConfig(CLK_SWITCHMODE_AUTO, 
                              CLK_SOURCE_HSI,
                              DISABLE,
                              CLK_CURRENTCLOCKSTATE_ENABLE);
-       
-       
-       
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_I2C, DISABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_ADC, ENABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_SPI, DISABLE);
@@ -128,13 +88,12 @@ void _Clock_setup(void)
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_UART1, DISABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER1, DISABLE);
        CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER2, ENABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER4, ENABLE);
+       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER4, DISABLE);
 
 }
 
 void _ADC_setup(void)
 {
-  
       GPIO_Init(GPIOD, GPIO_PIN_3,GPIO_MODE_IN_FL_NO_IT);
       GPIO_Init(GPIOD, GPIO_PIN_4,GPIO_MODE_IN_FL_NO_IT);
       GPIO_Init(GPIOD, GPIO_PIN_5,GPIO_MODE_IN_FL_NO_IT);
@@ -186,26 +145,13 @@ void _IWDG_setup(void)
   IWDG_SetPrescaler(IWDG_Prescaler_256);
   IWDG_SetReload(0xFF);
   IWDG_Enable();
-
 }
 
-
-
-void _TIM4_Setup(void)
-{
-  TIM4_DeInit();
-  
-  //TIM4_ARRPreloadConfig(ENABLE);
-  
-  //TIM4_TimeBaseInit(TIM4_PRESCALER_128, 0xFF);
- 
-  //TIM4_ITConfig(TIM4_IT_UPDATE, ENABLE);  
-  //TIM4_Cmd(ENABLE);
-  
-  
+void _TIM2_Setup(void)
+{ 
   ///TIM2
   TIM2_DeInit();
-  TIM2_TimeBaseInit(TIM2_PRESCALER_128, 0xFF);
+  TIM2_TimeBaseInit(TIM2_PRESCALER_4096, 244);
   TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
   TIM2_Cmd(ENABLE);
 }

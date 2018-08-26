@@ -277,11 +277,8 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
  bool test2 = false;
  INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
  {
-  /* In order to detect unexpected events during development,
-     it is recommended to set a breakpoint on the following instruction.
-  */
-   IWDG_ReloadCounter();
-          if(test2){
+   //IWDG_ReloadCounter();
+      if(test2){
         GPIO_WriteLow(GPIOB, GPIO_PIN_5);
         test2 = false;
       }else{
