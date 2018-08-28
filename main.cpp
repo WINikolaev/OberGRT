@@ -1,4 +1,9 @@
 #include "stm8s.h"
+#include "GPIO.h"
+#include "ADC.h"
+
+typedef enum {Check_engine, CRASH}_e_State_machine;
+_e_State_machine State_machine = Check_engine;
 
 
 void _ADC_setup(void);
@@ -18,18 +23,37 @@ void main()
 {
   
   _Clock_setup();
+  _GPIO_setup();
   _ADC_setup();
   _TIM2_Setup();
   _IWDG_setup();
-    
-  GPIO_Init(GPIOB, GPIO_PIN_5,GPIO_MODE_OUT_OD_HIZ_SLOW);
-  GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
   
   bool ADC_StartConversion = false;
   enableInterrupts();
   while(1)
   {
     IWDG_ReloadCounter();
+    
+    /*if(_IsThereLight() != RESET)
+    {
+      _LED_Off();
+    }else{
+      _LED_On();
+    }*/
+    
+    
+    
+    
+    /*switch(State_machine)
+    {
+      case Check_engine :
+          
+      break;
+    
+    default:
+    break;
+    }*/
+    
     
     if(!ADC_StartConversion)
     {
@@ -55,6 +79,7 @@ void main()
         GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
       }*/
     }
+    
     IWDG_ReloadCounter();
    }
 }
@@ -65,6 +90,7 @@ void assert_failed(uint8_t* file, uint32_t line)
   while(1){}
 }
 #endif
+
 
 void _Clock_setup(void)
 {

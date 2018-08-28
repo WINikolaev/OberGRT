@@ -274,17 +274,17 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
   * @param  None
   * @retval None
   */
- bool test2 = false;
+ //bool test2 = false;
  INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
  {
    //IWDG_ReloadCounter();
-      if(test2){
-        GPIO_WriteLow(GPIOB, GPIO_PIN_5);
-        test2 = false;
-      }else{
-        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-        test2 = true;
-      }
+    //  if(test2){
+    //    GPIO_WriteLow(GPIOB, GPIO_PIN_5);
+    //   test2 = false;
+    //  }else{
+    //GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
+    //  test2 = true;
+    // }
       TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
  }
 
