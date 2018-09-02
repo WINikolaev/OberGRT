@@ -2,85 +2,54 @@
 #include "GPIO.h"
 #include "ADC.h"
 
-typedef enum {Check_engine, CRASH}_e_State_machine;
-_e_State_machine State_machine = Check_engine;
+/// Extern value
+/// From ADC
+extern _str_ADC_value ADC_value;
+/// From stm8s_it
+extern uint8_t cntr_pump_period;
 
+/// This`s for account period (T = 0.5s) so _1s = 2*0.5
+typedef enum {_1s = 2, _2s = 4, _9s = 18}_e_period;
 
-void _ADC_setup(void);
+typedef enum {Check_fuel, TODO, CRASH}_e_State_machine;
+_e_State_machine State_machine = Check_fuel;
+
+// For activate the pump
+void _CheckFuel(void);
+
+// For configure the perefery
 void _Clock_setup(void);
 void _TIM2_Setup(void);
 void _IWDG_setup(void);
 
 
-
-
-uint16_t A3 = 0x0000;
-uint16_t A4 = 0x0000;
-uint16_t A5 = 0x0000;
-uint16_t A6 = 0x0000; 
-
 void main()
-{
-  
+{  
   _Clock_setup();
   _GPIO_setup();
   _ADC_setup();
   _TIM2_Setup();
   _IWDG_setup();
-  
-  bool ADC_StartConversion = false;
+  ADC_value.start_stop = false;
   enableInterrupts();
   while(1)
   {
     IWDG_ReloadCounter();
-    
-    /*if(_IsThereLight() != RESET)
+    ADC_update();
+    _CheckFuel();
+    switch(State_machine)
     {
-      _LED_Off();
-    }else{
-      _LED_On();
-    }*/
-    
-    
-    
-    
-    /*switch(State_machine)
-    {
-      case Check_engine :
-          
+      case Check_fuel :            
+        
+      break;
+      
+      case TODO :            
+        
       break;
     
     default:
     break;
-    }*/
-    
-    
-    if(!ADC_StartConversion)
-    {
-      ADC1_ScanModeCmd(ENABLE);
-      ADC1_StartConversion();
-      ADC_StartConversion = true;
     }
-    
-    if(ADC1_GetFlagStatus(ADC1_FLAG_EOC))
-    {
-      ADC1_ClearFlag(ADC1_FLAG_EOC);
-      ADC_StartConversion = false;
-      
-      A6 = ADC1_GetBufferValue(6);
-      A5 = ADC1_GetBufferValue(5);
-      A4 = ADC1_GetBufferValue(4);
-      A3 = ADC1_GetBufferValue(3);
-      /*
-      if(A4 > 500){
-        GPIO_WriteLow(GPIOB, GPIO_PIN_5);
-        
-      }else{
-        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-      }*/
-    }
-    
-    IWDG_ReloadCounter();
    }
 }
 
@@ -90,6 +59,37 @@ void assert_failed(uint8_t* file, uint32_t line)
   while(1){}
 }
 #endif
+///////////////////////////////////////////////////////////////////////////////
+/// For period T = 1s and T = 2s;
+_e_period _Pump_Period = _1s;
+void _CheckFuel(void)
+{    
+  if(!ADC_value.data_ready){return;}
+  
+  if(!(ADC_value.A5 < ADC_value.A6)){
+    _Pump_Off(); 
+    return;
+  }
+  
+  if(cntr_pump_period){return;}
+  
+  switch(_Pump_Period)
+  {
+    case _1s :
+      cntr_pump_period = _1s;
+      _Pump_On();  
+      _Pump_Period = _2s;
+    break;
+      
+    case _2s :            
+      cntr_pump_period = _2s;
+      _Pump_Off();  
+      _Pump_Period = _1s;
+    break;
+    default:break;
+  }
+
+}
 
 
 void _Clock_setup(void)
@@ -118,51 +118,6 @@ void _Clock_setup(void)
 
 }
 
-void _ADC_setup(void)
-{
-      GPIO_Init(GPIOD, GPIO_PIN_3,GPIO_MODE_IN_FL_NO_IT);
-      GPIO_Init(GPIOD, GPIO_PIN_4,GPIO_MODE_IN_FL_NO_IT);
-      GPIO_Init(GPIOD, GPIO_PIN_5,GPIO_MODE_IN_FL_NO_IT);
-      GPIO_Init(GPIOD, GPIO_PIN_6,GPIO_MODE_IN_FL_NO_IT);
-  
-      ADC1_DeInit();     
-       ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-                 ADC1_CHANNEL_6,
-                 ADC1_PRESSEL_FCPU_D18,
-                 ADC1_EXTTRIG_GPIO,
-                 DISABLE,
-                 ADC1_ALIGN_RIGHT,
-                 ADC1_SCHMITTTRIG_CHANNEL6,
-                 DISABLE);
-       ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-                 ADC1_CHANNEL_5,
-                 ADC1_PRESSEL_FCPU_D18,
-                 ADC1_EXTTRIG_GPIO,
-                 DISABLE,
-                 ADC1_ALIGN_RIGHT,
-                 ADC1_SCHMITTTRIG_CHANNEL5,
-                 DISABLE);
-        ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-                 ADC1_CHANNEL_4,
-                 ADC1_PRESSEL_FCPU_D18,
-                 ADC1_EXTTRIG_GPIO,
-                 DISABLE,
-                 ADC1_ALIGN_RIGHT,
-                 ADC1_SCHMITTTRIG_CHANNEL4,
-                 DISABLE);
-         ADC1_Init(ADC1_CONVERSIONMODE_SINGLE,
-                 ADC1_CHANNEL_3,
-                 ADC1_PRESSEL_FCPU_D18,
-                 ADC1_EXTTRIG_GPIO,
-                 DISABLE,
-                 ADC1_ALIGN_RIGHT,
-                 ADC1_SCHMITTTRIG_CHANNEL3,
-                 DISABLE);
-        
-        ADC1_ConversionConfig(ADC1_CONVERSIONMODE_SINGLE, (ADC1_Channel_TypeDef)(ADC1_CHANNEL_3 | ADC1_CHANNEL_4 | ADC1_CHANNEL_5 | ADC1_CHANNEL_6), ADC1_ALIGN_RIGHT);
-        ADC1_DataBufferCmd(ENABLE);
-        ADC1_Cmd(ENABLE);
-}
 
 void _IWDG_setup(void)
 {

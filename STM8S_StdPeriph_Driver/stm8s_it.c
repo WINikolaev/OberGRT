@@ -274,18 +274,16 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
   * @param  None
   * @retval None
   */
- //bool test2 = false;
+uint8_t cntr_pump_period = 0x00;
  INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
  {
-   //IWDG_ReloadCounter();
-    //  if(test2){
-    //    GPIO_WriteLow(GPIOB, GPIO_PIN_5);
-    //   test2 = false;
-    //  }else{
-    //GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-    //  test2 = true;
-    // }
-      TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
+
+ 
+   IWDG_ReloadCounter();
+   // For timing the pump
+   if(cntr_pump_period){cntr_pump_period--;}
+   
+   TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
  }
 
 /**
@@ -491,21 +489,12 @@ INTERRUPT_HANDLER(TIM6_UPD_OVF_TRG_IRQHandler, 23)
   * @param  None
   * @retval None
   */
- bool test1 = false;
+
  INTERRUPT_HANDLER(TIM4_UPD_OVF_IRQHandler, 23)
  {
   /* In order to detect unexpected events during development,
      it is recommended to set a breakpoint on the following instruction.
   */
-  
-   IWDG_ReloadCounter();
-          if(test1){
-        GPIO_WriteLow(GPIOB, GPIO_PIN_5);
-        test1 = false;
-      }else{
-        GPIO_WriteHigh(GPIOB, GPIO_PIN_5);
-        test1 = true;
-      }
  }
 #endif /* (STM8S903) || (STM8AF622x)*/
 
