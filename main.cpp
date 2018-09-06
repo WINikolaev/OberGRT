@@ -7,15 +7,27 @@
 extern _str_ADC_value ADC_value;
 /// From stm8s_it
 extern uint8_t cntr_pump_period;
-
+extern uint8_t cntr_start;
+extern uint8_t cntr_LED;
+extern uint8_t cntr_CRASH_T10;
 /// This`s for account period (T = 0.5s) so _1s = 2*0.5
-typedef enum {_1s = 2, _2s = 4, _9s = 18}_e_period;
+typedef enum {_1s = 2, _2s = 4, _10s = 20}_e_period;
 
-typedef enum {Check_fuel, TODO, CRASH}_e_State_machine;
+typedef enum {Check_fuel, START, TODO, CRASH}_e_State_machine;
 _e_State_machine State_machine = Check_fuel;
 
+/// Buttom check drz
+typedef enum {First_sample, Second_sample}_e_Buttom_drz;
+// For checking buttom the START
+static bool b_START = false;
+void _Check_START(void);
 // For activate the pump
 void _CheckFuel(void);
+// For activate the TEN
+void _Check_temperatureOil(void);
+
+/// LED State
+void _LED_state(void);
 
 // For configure the perefery
 void _Clock_setup(void);
@@ -31,19 +43,27 @@ void main()
   _TIM2_Setup();
   _IWDG_setup();
   ADC_value.start_stop = false;
+  
   enableInterrupts();
   while(1)
   {
     IWDG_ReloadCounter();
     ADC_update();
+    
     _CheckFuel();
+    _Check_START();
+    _LED_state();
     switch(State_machine)
     {
       case Check_fuel :            
+        _Check_temperatureOil();
+      break;
+      
+      case START :            
         
       break;
       
-      case TODO :            
+      case CRASH :
         
       break;
     
@@ -60,6 +80,39 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif
 ///////////////////////////////////////////////////////////////////////////////
+
+void _LED_state(void)
+{
+  if(cntr_LED){return;}
+  
+  if(b_START){
+    if(GPIO_ReadInputPin(GPIOB, GPIO_PIN_5)){
+      cntr_LED = _1s;
+      _LED_On();
+    }else{
+      cntr_LED = _1s;
+      _LED_Off();
+    }
+  }else{_LED_Off();}
+}
+
+
+
+void _Check_temperatureOil(void)
+{
+  if(!ADC_value.data_ready){return;}
+  
+  if(!(ADC_value.A3 < ADC_value.A4)){
+    _TEN_On(); 
+  }else{
+    _TEN_Off(); 
+    if(b_START){
+      //cntr_CRASH_T10 = _10s;
+      //State_machine = START;
+    }    
+  }
+}
+
 /// For period T = 1s and T = 2s;
 _e_period _Pump_Period = _1s;
 void _CheckFuel(void)
@@ -90,7 +143,31 @@ void _CheckFuel(void)
   }
 
 }
-
+_e_Buttom_drz Buttom_drz = First_sample;
+void _Check_START(void)
+{
+  switch (Buttom_drz){
+    case First_sample:
+      if(_IsThereStart()){
+        cntr_start = 1;
+        Buttom_drz = Second_sample;
+      }
+      break;
+    case Second_sample:
+      if(cntr_start == 0){
+        Buttom_drz = First_sample;
+        if(_IsThereStart()){
+          //_LED_On();
+          b_START = true;
+        }else{
+          //_LED_Off();
+          b_START = false;
+        }
+      }
+      break;
+    default:break;
+  }
+}
 
 void _Clock_setup(void)
 {
