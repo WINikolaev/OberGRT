@@ -1712,6 +1712,18 @@
         </file>
     </group>
     <file>
+        <name>$PROJ_DIR$\ADC.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\ADC.h</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\GPIO.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\GPIO.h</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\main.cpp</name>
     </file>
 </project>

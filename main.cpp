@@ -9,17 +9,22 @@ extern _str_ADC_value ADC_value;
 extern uint8_t cntr_pump_period;
 extern uint8_t cntr_start;
 extern uint8_t cntr_LED;
-extern uint8_t cntr_CRASH_T10;
+extern uint8_t cntr_Check_CRASH_T10;
 /// This`s for account period (T = 0.5s) so _1s = 2*0.5
 typedef enum {_1s = 2, _2s = 4, _10s = 20}_e_period;
 
-typedef enum {Check_fuel, START, TODO, CRASH}_e_State_machine;
+typedef enum {Check_fuel, START_Off, START_On_and_Check, START_OK, CRASH}_e_State_machine;
 _e_State_machine State_machine = Check_fuel;
 
 /// Buttom check drz
 typedef enum {First_sample, Second_sample}_e_Buttom_drz;
 // For checking buttom the START
 static bool b_START = false;
+static bool b_Variable_Written = false;
+static bool b_State_system = false;
+// For state oil
+static bool b_OilTemperatureOK = false;
+
 void _Check_START(void);
 // For activate the pump
 void _CheckFuel(void);
@@ -58,13 +63,34 @@ void main()
       case Check_fuel :            
         _Check_temperatureOil();
       break;
+      case START_Off :            
+
+      break;
       
-      case START :            
-        
+      case START_On_and_Check :            
+          _AIR_On();
+          _FIRE_On();
+          if(_IsThereLight()){
+            State_machine = START_OK;
+            b_State_system = true;
+          }else{
+            if(!cntr_Check_CRASH_T10){State_machine = CRASH;}
+          }
+      break;
+      
+      case START_OK :
+        _AIR_On();
+        _FIRE_Off();
+        _LED_On();
+        if(!_IsThereLight()){
+          State_machine = START_On_and_Check;
+          cntr_Check_CRASH_T10 = _10s;
+          b_State_system = false;
+        }   
       break;
       
       case CRASH :
-        
+        while(1){ IWDG_ReloadCounter();}
       break;
     
     default:
@@ -85,7 +111,7 @@ void _LED_state(void)
 {
   if(cntr_LED){return;}
   
-  if(b_START){
+  if(b_START && !b_State_system){
     if(GPIO_ReadInputPin(GPIOB, GPIO_PIN_5)){
       cntr_LED = _1s;
       _LED_On();
@@ -104,12 +130,10 @@ void _Check_temperatureOil(void)
   
   if(!(ADC_value.A3 < ADC_value.A4)){
     _TEN_On(); 
+    b_OilTemperatureOK = false;
   }else{
-    _TEN_Off(); 
-    if(b_START){
-      //cntr_CRASH_T10 = _10s;
-      //State_machine = START;
-    }    
+    _TEN_Off();
+    b_OilTemperatureOK = true;   
   }
 }
 
@@ -151,6 +175,7 @@ void _Check_START(void)
       if(_IsThereStart()){
         cntr_start = 1;
         Buttom_drz = Second_sample;
+        if(b_OilTemperatureOK){State_machine = START_On_and_Check;}
       }
       break;
     case Second_sample:
@@ -159,9 +184,18 @@ void _Check_START(void)
         if(_IsThereStart()){
           //_LED_On();
           b_START = true;
+          if(b_OilTemperatureOK){
+            State_machine = START_On_and_Check;
+            if(!b_Variable_Written){
+              cntr_Check_CRASH_T10 = _10s;
+              b_Variable_Written = true;
+            }
+            
+          }
         }else{
           //_LED_Off();
           b_START = false;
+          if(b_OilTemperatureOK){State_machine = START_Off;}
         }
       }
       break;

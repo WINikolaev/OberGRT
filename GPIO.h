@@ -11,6 +11,8 @@ void _Pump_On(void);
 void _Pump_Off(void);
 void _AIR_On(void);
 void _AIR_Off(void);
+void _FIRE_On(void);
+void _FIRE_Off(void);
 void _TEN_On(void);
 void _TEN_Off(void);
 
