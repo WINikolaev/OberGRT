@@ -10,6 +10,7 @@ extern uint8_t cntr_pump_period;
 extern uint8_t cntr_start;
 extern uint8_t cntr_LED;
 extern uint8_t cntr_Check_CRASH_T10;
+extern uint8_t CRASH_SYSTEM;
 /// This`s for account period (T = 0.5s) so _1s = 2*0.5
 typedef enum {_1s = 2, _2s = 4, _10s = 20}_e_period;
 
@@ -40,6 +41,9 @@ void _TIM2_Setup(void);
 void _IWDG_setup(void);
 
 
+static uint8_t absbsb = 0x00;
+
+
 void main()
 {  
   _Clock_setup();
@@ -64,12 +68,13 @@ void main()
         _Check_temperatureOil();
       break;
       case START_Off :            
-
+          volatile char check_test = 0x00;
       break;
       
       case START_On_and_Check :            
           _AIR_On();
           _FIRE_On();
+
           if(_IsThereLight()){
             State_machine = START_OK;
             b_State_system = true;
@@ -82,7 +87,7 @@ void main()
         _AIR_On();
         _FIRE_Off();
         _LED_On();
-        if(!_IsThereLight()){
+        if(!(absbsb = _IsThereLight())){
           State_machine = START_On_and_Check;
           cntr_Check_CRASH_T10 = _10s;
           b_State_system = false;
@@ -90,7 +95,30 @@ void main()
       break;
       
       case CRASH :
-        while(1){ IWDG_ReloadCounter();}
+        _LED_Off();
+        _Pump_Off();
+        _AIR_Off();
+        _FIRE_Off();
+        _TEN_Off();
+        
+        TIM2_DeInit();
+        TIM2_TimeBaseInit(TIM2_PRESCALER_4096, 100);
+        TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
+         TIM2_Cmd(ENABLE);
+        
+        CRASH_SYSTEM = 1;
+        while(1){
+          IWDG_ReloadCounter();
+          if(!CRASH_SYSTEM){
+            if(GPIO_ReadInputPin(GPIOB, GPIO_PIN_5)){
+              CRASH_SYSTEM = 1;
+              _LED_On();
+            }else{
+              CRASH_SYSTEM = 1;
+              _LED_Off();
+            }
+          }
+        }
       break;
     
     default:
@@ -175,7 +203,7 @@ void _Check_START(void)
       if(_IsThereStart()){
         cntr_start = 1;
         Buttom_drz = Second_sample;
-        if(b_OilTemperatureOK){State_machine = START_On_and_Check;}
+        //if(b_OilTemperatureOK){State_machine = START_On_and_Check;}
       }
       break;
     case Second_sample:
@@ -184,7 +212,7 @@ void _Check_START(void)
         if(_IsThereStart()){
           //_LED_On();
           b_START = true;
-          if(b_OilTemperatureOK){
+          if(b_OilTemperatureOK && !b_State_system){
             State_machine = START_On_and_Check;
             if(!b_Variable_Written){
               cntr_Check_CRASH_T10 = _10s;
@@ -195,7 +223,9 @@ void _Check_START(void)
         }else{
           //_LED_Off();
           b_START = false;
-          if(b_OilTemperatureOK){State_machine = START_Off;}
+          if(b_OilTemperatureOK){
+            State_machine = START_Off;
+          }
         }
       }
       break;

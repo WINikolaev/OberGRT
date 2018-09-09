@@ -278,6 +278,7 @@ uint8_t cntr_pump_period = 0x00;
 uint8_t cntr_start = 0x00;
 uint8_t cntr_LED = 0x00;
 uint8_t cntr_Check_CRASH_T10 = 0x00;
+uint8_t CRASH_SYSTEM = 0x00;
  INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
  {
 
@@ -291,6 +292,8 @@ uint8_t cntr_Check_CRASH_T10 = 0x00;
    if(cntr_LED){cntr_LED--;}
    /// LED with T = 1;  
    if(cntr_Check_CRASH_T10){cntr_Check_CRASH_T10--;}
+   /// Crash system timer;
+   if(CRASH_SYSTEM){CRASH_SYSTEM--;}
    TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
  }
 
