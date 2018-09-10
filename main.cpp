@@ -68,7 +68,11 @@ void main()
         _Check_temperatureOil();
       break;
       case START_Off :            
-          volatile char check_test = 0x00;
+        _LED_Off();
+        _Pump_Off();
+        _AIR_Off();
+        _FIRE_Off();
+        _TEN_Off();
       break;
       
       case START_On_and_Check :            
@@ -156,7 +160,7 @@ void _Check_temperatureOil(void)
 {
   if(!ADC_value.data_ready){return;}
   
-  if(!(ADC_value.A3 < ADC_value.A4)){
+  if(!(ADC_value.A3 > ADC_value.A4)){
     _TEN_On(); 
     b_OilTemperatureOK = false;
   }else{
