@@ -41,9 +41,6 @@ void _TIM2_Setup(void);
 void _IWDG_setup(void);
 
 
-static uint8_t absbsb = 0x00;
-
-
 void main()
 {  
   _Clock_setup();
@@ -62,6 +59,7 @@ void main()
     _CheckFuel();
     _Check_START();
     _LED_state();
+    inputReade();
     switch(State_machine)
     {
       case Check_fuel :            
@@ -73,6 +71,8 @@ void main()
         _AIR_Off();
         _FIRE_Off();
         _TEN_Off();
+         b_State_system = false;
+         cntr_Check_CRASH_T10 = _10s;
       break;
       
       case START_On_and_Check :            
@@ -91,7 +91,7 @@ void main()
         _AIR_On();
         _FIRE_Off();
         _LED_On();
-        if(!(absbsb = _IsThereLight())){
+        if(!_IsThereLight()){
           State_machine = START_On_and_Check;
           cntr_Check_CRASH_T10 = _10s;
           b_State_system = false;
