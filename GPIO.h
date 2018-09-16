@@ -3,6 +3,7 @@
 
 #include "stm8s.h"
 
+
 void _GPIO_setup(void);
 // OUTPUT
 void _LED_On(void);
@@ -39,5 +40,9 @@ typedef union{
   str_bit b;
 }u_input_read;
 
+
 void inputReade(void);
+
+bool get_inputStart(void);
+bool get_inputLight(void);
 #endif	//_GPIO_H_
