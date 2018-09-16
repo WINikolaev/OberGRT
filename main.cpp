@@ -67,7 +67,7 @@ void main()
       break;
       case START_Off :            
         _LED_Off();
-        _Pump_Off();
+        //_Pump_Off();
         _AIR_Off();
         _FIRE_Off();
         _TEN_Off();
@@ -79,7 +79,8 @@ void main()
           _AIR_On();
           _FIRE_On();
 
-          if(_IsThereLight()){
+          //if(_IsThereLight()){
+          if(get_inputLight()){
             State_machine = START_OK;
             b_State_system = true;
           }else{
@@ -91,7 +92,8 @@ void main()
         _AIR_On();
         _FIRE_Off();
         _LED_On();
-        if(!_IsThereLight()){
+        //if(!_IsThereLight()){
+        if(!get_inputLight()){
           State_machine = START_On_and_Check;
           cntr_Check_CRASH_T10 = _10s;
           b_State_system = false;
@@ -204,7 +206,8 @@ void _Check_START(void)
 {
   switch (Buttom_drz){
     case First_sample:
-      if(_IsThereStart()){
+      //if(_IsThereStart()){
+      if(get_inputStart()){
         cntr_start = 1;
         Buttom_drz = Second_sample;
         //if(b_OilTemperatureOK){State_machine = START_On_and_Check;}
@@ -213,7 +216,8 @@ void _Check_START(void)
     case Second_sample:
       if(cntr_start == 0){
         Buttom_drz = First_sample;
-        if(_IsThereStart()){
+        //if(_IsThereStart()){
+        if(get_inputStart()){
           //_LED_On();
           b_START = true;
           if(b_OilTemperatureOK && !b_State_system){

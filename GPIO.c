@@ -64,8 +64,10 @@ void _LED_Off(void){GPIO_WriteHigh(GPIOB, GPIO_PIN_5);}
 _e_count_input cnt_input;
 u_input_read input_start;
 u_input_read input_light;
+
 uint8_t result_start = 0x00;
 uint8_t result_light = 0x00;
+
 void inputReade(void)
 {
   switch(cnt_input){
@@ -118,6 +120,7 @@ void inputReade(void)
        result_start = input_start.b.b0&input_start.b.b2&input_start.b.b3&input_start.b.b4&input_start.b.b5&input_start.b.b6&input_start.b.b7;
        result_light = input_light.b.b0&input_light.b.b2&input_light.b.b3&input_light.b.b4&input_light.b.b5&input_light.b.b6&input_light.b.b7;
        
+       
        cnt_input = _1;
     break;
     
@@ -125,3 +128,6 @@ void inputReade(void)
     break;
   }
 }
+
+bool get_inputStart(void){return result_start? true:false;};
+bool get_inputLight(void){return result_light? true:false;};
