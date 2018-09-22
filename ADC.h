@@ -13,6 +13,6 @@ typedef struct{
   bool data_ready;
 }_str_ADC_value;
 
-void _ADC_setup(void);
-void ADC_update(void);
+void setup_ADC(void);
+void ADC_Updating(void);
 #endif	//_GPIO_H_

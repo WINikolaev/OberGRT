@@ -2,7 +2,7 @@
 
 
 
-void _GPIO_setup(void)
+void setup_GPIO(void)
 {
   // OUTPUT
   

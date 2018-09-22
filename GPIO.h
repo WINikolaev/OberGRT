@@ -4,7 +4,7 @@
 #include "stm8s.h"
 
 
-void _GPIO_setup(void);
+void setup_GPIO(void);
 // OUTPUT
 void _LED_On(void);
 void _LED_Off(void);

@@ -1,6 +1,5 @@
 #include "stm8s.h"
-#include "GPIO.h"
-#include "ADC.h"
+#include "AllThings.h"
 
 /// Extern value
 /// From ADC
@@ -35,26 +34,16 @@ void _Check_temperatureOil(void);
 /// LED State
 void _LED_state(void);
 
-// For configure the perefery
-void _Clock_setup(void);
-void _TIM2_Setup(void);
-void _IWDG_setup(void);
-
 
 void main()
 {  
-  _Clock_setup();
-  _GPIO_setup();
-  _ADC_setup();
-  _TIM2_Setup();
-  _IWDG_setup();
-  ADC_value.start_stop = false;
-  
+  setup_Peripheral();
+
   enableInterrupts();
   while(1)
   {
     IWDG_ReloadCounter();
-    ADC_update();
+    ADC_Updating();
     
     _CheckFuel();
     _Check_START();
@@ -67,7 +56,6 @@ void main()
       break;
       case START_Off :            
         _LED_Off();
-        //_Pump_Off();
         _AIR_Off();
         _FIRE_Off();
         _TEN_Off();
@@ -78,8 +66,6 @@ void main()
       case START_On_and_Check :            
           _AIR_On();
           _FIRE_On();
-
-          //if(_IsThereLight()){
           if(get_inputLight()){
             State_machine = START_OK;
             b_State_system = true;
@@ -92,7 +78,6 @@ void main()
         _AIR_On();
         _FIRE_Off();
         _LED_On();
-        //if(!_IsThereLight()){
         if(!get_inputLight()){
           State_machine = START_On_and_Check;
           cntr_Check_CRASH_T10 = _10s;
@@ -140,7 +125,8 @@ void assert_failed(uint8_t* file, uint32_t line)
 }
 #endif
 ///////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 void _LED_state(void)
 {
   if(cntr_LED){return;}
@@ -177,6 +163,9 @@ void _CheckFuel(void)
 {    
   if(!ADC_value.data_ready){return;}
   
+  /// 25% ot ADC_value.A5
+  uint16_t _25pA5 = ADC_value.A5/4;
+  ADC_value.A5 -=_25pA5;
   if(!(ADC_value.A5 < ADC_value.A6)){
     _Pump_Off(); 
     return;
@@ -239,49 +228,4 @@ void _Check_START(void)
       break;
     default:break;
   }
-}
-
-void _Clock_setup(void)
-{
-       CLK_DeInit();
-       CLK_HSECmd(DISABLE);
-       CLK_LSICmd(DISABLE);
-       CLK_HSICmd(ENABLE);
-       //CLK_CCOCmd(ENABLE);
-       //CLK_CCOConfig(CLK_OUTPUT_MASTER);
-       while(CLK_GetFlagStatus(CLK_FLAG_HSIRDY) == FALSE);
-       CLK_ClockSwitchCmd(ENABLE);
-       CLK_HSIPrescalerConfig(CLK_PRESCALER_HSIDIV8);     
-       CLK_ClockSwitchConfig(CLK_SWITCHMODE_AUTO, 
-                             CLK_SOURCE_HSI,
-                             DISABLE,
-                             CLK_CURRENTCLOCKSTATE_ENABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_I2C, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_ADC, ENABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_SPI, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_AWU, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_UART1, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER1, DISABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER2, ENABLE);
-       CLK_PeripheralClockConfig(CLK_PERIPHERAL_TIMER4, DISABLE);
-
-}
-
-
-void _IWDG_setup(void)
-{
-/// IWDG 
-  IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-  IWDG_SetPrescaler(IWDG_Prescaler_256);
-  IWDG_SetReload(0xFF);
-  IWDG_Enable();
-}
-
-void _TIM2_Setup(void)
-{ 
-  ///TIM2
-  TIM2_DeInit();
-  TIM2_TimeBaseInit(TIM2_PRESCALER_4096, 244);
-  TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
-  TIM2_Cmd(ENABLE);
 }
