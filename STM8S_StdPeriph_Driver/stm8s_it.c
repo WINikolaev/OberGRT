@@ -281,8 +281,6 @@ uint8_t cntr_Check_CRASH_T10 = 0x00;
 uint8_t CRASH_SYSTEM = 0x00;
  INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
  {
-
- 
    IWDG_ReloadCounter();
    /// For timing the pump
    if(cntr_pump_period){cntr_pump_period--;}

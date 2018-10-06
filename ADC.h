@@ -14,5 +14,5 @@ typedef struct{
 }_str_ADC_value;
 
 void setup_ADC(void);
-void ADC_Updating(void);
+void ADC_Updating(_str_ADC_value* ADC);
 #endif	//_GPIO_H_

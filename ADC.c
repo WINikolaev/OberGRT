@@ -1,30 +1,28 @@
 #include "ADC.h"
 #include "GPIO.h"
+
 _str_ADC_value ADC_value;
 
-
-
-void ADC_Updating(void)
+void ADC_Updating(_str_ADC_value* ADC)
 {
   if(!ADC_value.start_stop){     
      ADC1_ScanModeCmd(ENABLE);
      ADC1_StartConversion();
-     ADC_value.data_ready = false;
-     ADC_value.start_stop = true;
+     ADC->data_ready = false;
+     ADC->start_stop = true;
    }
   
    if(ADC1_GetFlagStatus(ADC1_FLAG_EOC)){
      ADC1_ClearFlag(ADC1_FLAG_EOC);
-     ADC_value.start_stop = false;
+     ADC->start_stop = false;
       
-     ADC_value.A6 = ADC1_GetBufferValue(6);
-     ADC_value.A5 = ADC1_GetBufferValue(5);
-     ADC_value.A4 = ADC1_GetBufferValue(4);
-     ADC_value.A3 = ADC1_GetBufferValue(3);
-     ADC_value.data_ready = true;
+     ADC->A6 = ADC1_GetBufferValue(6);
+     ADC->A5 = ADC1_GetBufferValue(5);
+     ADC->A4 = ADC1_GetBufferValue(4);
+     ADC->A3 = ADC1_GetBufferValue(3);
+     ADC->data_ready = true;
    }
 }
-
 
 
 
