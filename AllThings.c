@@ -1,6 +1,7 @@
 #include "AllThings.h"
 
 extern uint8_t cntr_pump_period;
+extern uint16_t cntr_Wait_Oil;
 extern uint8_t cntr_start;
 extern uint8_t cntr_LED;
 extern uint8_t cntr_Check_CRASH_T10;
@@ -17,41 +18,45 @@ void setup_Peripheral(void)
   setup_IWDG();
 }
 
-bool _ref_b_OilTemperatureOK = false;
+bool b_Ready = false;
 
-void checkTemperatureOil(_str_ADC_value* ADC)
+bool checkTemperatureOil(_str_ADC_value* ADC)
 {
-  if(!ADC->data_ready){return;}
+  if(!ADC->data_ready){return b_Ready;}
   
   if(!(ADC->A3 > ADC->A4)){
     _TEN_On(); 
-    _ref_b_OilTemperatureOK = false;
   }else{
     _TEN_Off();
-    _ref_b_OilTemperatureOK = true;   
+    b_Ready = true;   
   }
+  return b_Ready;
 }
-
-bool getOilTemperature(){return _ref_b_OilTemperatureOK;}
 
 
 
 /// Проверяем уровень масла
 _e_period v_Pump_Period = _1s;
-void checkFuel_Level(_str_ADC_value* ADC)
+static bool b_Wait2Minute = false;
+void checkFuel_Level(void)
 {
-  if(!ADC->data_ready){return;}
-  
-  /// 25% ot ADC_value.A5
-  uint16_t _25pA5 = ADC->A5/4;
-  
-  ADC->A5 -=_25pA5;
-  
-  if(!(ADC->A5 < ADC->A6)){
+  /// Если масло есть то обновляем переменные и выходим
+  if(!get_inputOilLevel()){
     _Pump_Off(); 
+    cntr_Wait_Oil = 0;
+    b_Wait2Minute = false;
+    cntr_pump_period = _1s;
     return;
   }
-  
+  /// иначе чекаем флаг, если не выставляли ожидание на 1-2 минуты, то ставим и ждем пока натикает 1-2 минуты
+  if(!b_Wait2Minute){
+    cntr_Wait_Oil = 10;
+    b_Wait2Minute = true;
+  }else{
+    /// и крутимся здесь необходимое нам премя
+    if(cntr_Wait_Oil){return;}
+  }
+  /// После чего идет вторая временка, которая отыгрывает период в 1 сек - работает насос, 2 сек - не работает
   if(cntr_pump_period){return;}
   
   switch(v_Pump_Period)
@@ -110,3 +115,14 @@ void setup_TIM2(void)
   TIM2_ITConfig(TIM2_IT_UPDATE, ENABLE);
   TIM2_Cmd(ENABLE);
 }
+
+void All_OFF()
+{
+  //_LED_Off();
+  _AIR_Off();
+  _FIRE_Off();
+  if(!b_Ready){_TEN_Off();}
+  //b_State_system = false;
+  cntr_Check_CRASH_T10 = _10s;
+}
+

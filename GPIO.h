@@ -20,7 +20,9 @@ void _TEN_Off(void);
 // INPUT
 BitStatus _IsThereLight(void); 
 BitStatus _IsThereStart(void); 
-
+BitStatus _IsThereOilLevel(void);
+BitStatus _CheckPump(void);
+BitStatus _LED_State(void);
 
 // Check State input
 typedef enum {_1, _2, _3, _4, _5, _6, _7, _8}_e_count_input;
@@ -45,4 +47,8 @@ void inputReade(void);
 
 bool get_inputStart(void);
 bool get_inputLight(void);
+bool get_inputOilLevel(void);
+
+
+
 #endif	//_GPIO_H_

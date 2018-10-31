@@ -32,13 +32,17 @@ void setup_GPIO(void)
   GPIO_Init(GPIOA, GPIO_PIN_3,GPIO_MODE_IN_PU_NO_IT);
   // There is START
   GPIO_Init(GPIOB, GPIO_PIN_4,GPIO_MODE_IN_PU_NO_IT);
-  
+  // check oil level
+  GPIO_Init(GPIOD, GPIO_PIN_5,GPIO_MODE_IN_PU_NO_IT);
   
 }
 
 // INPUT
 BitStatus _IsThereLight(void){ return GPIO_ReadInputPin(GPIOA, GPIO_PIN_3);}
 BitStatus _IsThereStart(void){ return GPIO_ReadInputPin(GPIOB, GPIO_PIN_4);}
+BitStatus _IsThereOilLevel(void){ return GPIO_ReadInputPin(GPIOD, GPIO_PIN_5);}
+BitStatus _CheckPump(void){ return GPIO_ReadInputPin(GPIOC, GPIO_PIN_5);}
+BitStatus _LED_State(void){return GPIO_ReadInputPin(GPIOB, GPIO_PIN_5);}
 
 // OUTPUT
 
@@ -64,9 +68,11 @@ void _LED_Off(void){GPIO_WriteHigh(GPIOB, GPIO_PIN_5);}
 _e_count_input cnt_input;
 u_input_read input_start;
 u_input_read input_light;
+u_input_read input_Oil_Level;
 
 uint8_t result_start = 0x00;
 uint8_t result_light = 0x00;
+uint8_t result_Oil_Level = 0x00;
 
 void inputReade(void)
 {
@@ -74,52 +80,61 @@ void inputReade(void)
     case _1:
       input_start.b.b0  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
       input_light.b.b0  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+      input_Oil_Level.b.b0  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
       cnt_input = _2;
     break;
   
     case _2:
       input_start.b.b1  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
       input_light.b.b1  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+      input_Oil_Level.b.b1  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
       cnt_input = _3;
     break;
   
     case _3:
       input_start.b.b2  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
       input_light.b.b2  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+      input_Oil_Level.b.b2  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
       cnt_input = _4;
     break;
   
     case _4:
       input_start.b.b3  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
       input_light.b.b3  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+      
+      input_Oil_Level.b.b3  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
       cnt_input = _5;
     break;
   
     case _5:
       input_start.b.b4  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
       input_light.b.b4  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+      input_Oil_Level.b.b4  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
       cnt_input = _6;
     break;
     
     case _6:
        input_start.b.b5  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
        input_light.b.b5  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+       input_Oil_Level.b.b5  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
        cnt_input = _7;
     break;
     
     case _7:
        input_start.b.b6  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
        input_light.b.b6  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+       input_Oil_Level.b.b6  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
        cnt_input = _8;
     break;
     
     case _8:
        input_start.b.b7  = GPIO_ReadInputPin(GPIOB, GPIO_PIN_4)? 1 : 0;
        input_light.b.b7  = GPIO_ReadInputPin(GPIOA, GPIO_PIN_3)? 1 : 0;
+       input_Oil_Level.b.b7  = GPIO_ReadInputPin(GPIOD, GPIO_PIN_5)? 1 : 0;
        
        result_start = input_start.b.b0&input_start.b.b2&input_start.b.b3&input_start.b.b4&input_start.b.b5&input_start.b.b6&input_start.b.b7;
        result_light = input_light.b.b0&input_light.b.b2&input_light.b.b3&input_light.b.b4&input_light.b.b5&input_light.b.b6&input_light.b.b7;
-       
+       result_Oil_Level = input_Oil_Level.b.b0 | input_Oil_Level.b.b2&input_Oil_Level.b.b3 | input_Oil_Level.b.b4&input_Oil_Level.b.b5 | input_Oil_Level.b.b6 | input_Oil_Level.b.b7;
        
        cnt_input = _1;
     break;
@@ -131,3 +146,6 @@ void inputReade(void)
 
 bool get_inputStart(void){return result_start? true:false;};
 bool get_inputLight(void){return result_light? true:false;};
+bool get_inputOilLevel(void){return result_Oil_Level? true:false;};
+
+

@@ -10,9 +10,9 @@
 /// This`s for account period (T = 0.5s) so _1s = 2*0.5
 typedef enum {_1s = 2, _2s = 4, _10s = 20}_e_period;
 /// Состояния управляющей платы
-typedef enum {Check_fuel, START_Off, START_On_and_Check, START_OK, CRASH}_e_State_machine;
+typedef enum {WAIT, START_WORK, WORKING, CRASH}_e_State_machine;
 /// Buttom check drz
-typedef enum {First_sample, Second_sample}_e_Buttom_drz;
+typedef enum {First_sample, Second_sample, setup}_e_Buttom_drz;
 
 
 /// Config ALL periheral
@@ -25,7 +25,7 @@ void setup_TIM2(void);
 void setup_IWDG(void);
 
 
-void checkFuel_Level(_str_ADC_value* ADC_value);
-void checkTemperatureOil(_str_ADC_value* ADC);
-bool getOilTemperature();
+void checkFuel_Level(void);
+bool checkTemperatureOil(_str_ADC_value* ADC);
+void All_OFF();
 #endif	//_AllThings_H_
