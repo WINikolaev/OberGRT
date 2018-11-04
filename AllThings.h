@@ -25,7 +25,7 @@ void setup_TIM2(void);
 void setup_IWDG(void);
 
 
-void checkFuel_Level(void);
+bool checkFuel_Level(void);
 bool checkTemperatureOil(_str_ADC_value* ADC);
 void All_OFF();
 #endif	//_AllThings_H_

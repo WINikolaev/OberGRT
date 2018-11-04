@@ -38,15 +38,17 @@ bool checkTemperatureOil(_str_ADC_value* ADC)
 /// Проверяем уровень масла
 _e_period v_Pump_Period = _1s;
 static bool b_Wait2Minute = false;
-void checkFuel_Level(void)
+static bool isFirstLevel = false;
+bool checkFuel_Level(void)
 {
   /// Если масло есть то обновляем переменные и выходим
   if(!get_inputOilLevel()){
     _Pump_Off(); 
+    isFirstLevel = true;
     cntr_Wait_Oil = 0;
     b_Wait2Minute = false;
     cntr_pump_period = _1s;
-    return;
+    return isFirstLevel;
   }
   /// иначе чекаем флаг, если не выставляли ожидание на 1-2 минуты, то ставим и ждем пока натикает 1-2 минуты
   if(!b_Wait2Minute){
@@ -54,10 +56,10 @@ void checkFuel_Level(void)
     b_Wait2Minute = true;
   }else{
     /// и крутимся здесь необходимое нам премя
-    if(cntr_Wait_Oil){return;}
+    if(cntr_Wait_Oil){return isFirstLevel;}
   }
   /// После чего идет вторая временка, которая отыгрывает период в 1 сек - работает насос, 2 сек - не работает
-  if(cntr_pump_period){return;}
+  if(cntr_pump_period){return isFirstLevel;}
   
   switch(v_Pump_Period)
   {
@@ -74,6 +76,7 @@ void checkFuel_Level(void)
     break;
     default:break;
   }
+  return isFirstLevel;
 }
 
 

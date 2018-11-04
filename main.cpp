@@ -46,16 +46,19 @@ void main()
   {
     IWDG_ReloadCounter();
     /// Чекаем состояния входных сигналов
-    inputReade();
+    if(!_IsThereFire()){
+      inputReade();
+    }    
     /// Проверяем уровень масла
-    checkFuel_Level();
+    /// Пока масло не накачается мы не должны его подогревать
+    if(checkFuel_Level()){
+      /// Проверяем температуру масла
+      b_Ready = checkTemperatureOil(&sADC);
+    }
     // Чекаем наши АЦПшки
-    ADC_Updating(&sADC);
-    /// Проверяем температуру масла
-    b_Ready = checkTemperatureOil(&sADC);
-  
-    
-    
+    if(!_IsThereFire()){
+      ADC_Updating(&sADC);
+    }
     _LED_state();
     switch(State_machine)
     {

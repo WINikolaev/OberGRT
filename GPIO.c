@@ -43,6 +43,7 @@ BitStatus _IsThereStart(void){ return GPIO_ReadInputPin(GPIOB, GPIO_PIN_4);}
 BitStatus _IsThereOilLevel(void){ return GPIO_ReadInputPin(GPIOD, GPIO_PIN_5);}
 BitStatus _CheckPump(void){ return GPIO_ReadInputPin(GPIOC, GPIO_PIN_5);}
 BitStatus _LED_State(void){return GPIO_ReadInputPin(GPIOB, GPIO_PIN_5);}
+BitStatus _IsThereFire(void){ return GPIO_ReadInputPin(GPIOC, GPIO_PIN_6);}
 
 // OUTPUT
 

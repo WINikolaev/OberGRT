@@ -18,13 +18,30 @@ void ADC_Updating(_str_ADC_value* ADC)
       
      ADC->A6 = ADC1_GetBufferValue(6);
      //ADC->A5 = ADC1_GetBufferValue(5);
-     ADC->A4 = ADC1_GetBufferValue(4);
+     //ADC->A4 = ADC1_GetBufferValue(4);
+     ADC->A4 = _Resistor_Filter(ADC1_GetBufferValue(4));
+     
      ADC->A3 = ADC1_GetBufferValue(3);
      ADC->data_ready = true;
    }
 }
 
 
+char cntr_i = 0x00;
+uint16_t sum = 0x00;
+uint16_t sum_save = 0x00;
+uint16_t _Resistor_Filter(uint16_t value)
+{
+  if(cntr_i == DEV){
+      sum_save = sum/DEV;
+      sum = 0x00;
+      cntr_i = 0x00;
+      return sum_save;
+  }
+  sum += value;
+  cntr_i++;
+  return sum_save;
+}
 
 void setup_ADC(void)
 {
