@@ -2185,6 +2185,12 @@
         <name>$PROJ_DIR$\ADC.h</name>
     </file>
     <file>
+        <name>$PROJ_DIR$\AllThings.c</name>
+    </file>
+    <file>
+        <name>$PROJ_DIR$\AllThings.h</name>
+    </file>
+    <file>
         <name>$PROJ_DIR$\GPIO.c</name>
     </file>
     <file>

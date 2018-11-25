@@ -9,28 +9,36 @@ extern uint8_t CRASH_SYSTEM;
 
 
 
-void setup_Peripheral(void)
+void setup_Peripheral()
 {
   setup_CLK();
   setup_GPIO();
   setup_ADC();
   setup_TIM2();
   setup_IWDG();
+  
+  _FIRE_Off();
+  _TEN_Off();
+  _AIR_Off();
+  _Pump_Off();
+  _LED_Off();
 }
 
-bool b_Ready = false;
+bool isReady = false;
 
-bool checkTemperatureOil(_str_ADC_value* ADC)
+bool checkTemperatureOil()
 {
-  if(!ADC->data_ready){return b_Ready;}
+  bool isADC_Ready = get_ADC_Ready();
+  if(!isADC_Ready){return isReady;}
   
+  str_ADC_value* ADC = get_ADC_Value();
   if(!(ADC->A3 > ADC->A4)){
     _TEN_On(); 
   }else{
     _TEN_Off();
-    b_Ready = true;   
+    isReady = true;   
   }
-  return b_Ready;
+  return isReady;
 }
 
 
@@ -42,7 +50,7 @@ static bool isFirstLevel = false;
 bool checkFuel_Level(void)
 {
   /// Если масло есть то обновляем переменные и выходим
-  if(!get_inputOilLevel()){
+  if(isOilLevel()){
     _Pump_Off(); 
     isFirstLevel = true;
     cntr_Wait_Oil = 0;
@@ -124,7 +132,7 @@ void All_OFF()
   //_LED_Off();
   _AIR_Off();
   _FIRE_Off();
-  if(!b_Ready){_TEN_Off();}
+  if(!isReady){_TEN_Off();}
   //b_State_system = false;
   cntr_Check_CRASH_T10 = _10s;
 }

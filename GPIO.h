@@ -36,19 +36,19 @@ typedef struct{
   uint8_t b5: 1;
   uint8_t b6: 1;
   uint8_t b7: 1;
-}str_bit;
+}str_bits;
 
 typedef union{
   uint8_t a;
-  str_bit b;
+  str_bits b;
 }u_input_read;
 
 
-void inputReade(void);
+void read_Input_IO(void);
 
-bool get_inputStart(void);
+bool isStart(void);
 bool get_inputLight(void);
-bool get_inputOilLevel(void);
+bool isOilLevel(void);
 
 
 

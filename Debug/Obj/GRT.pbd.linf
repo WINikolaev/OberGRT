@@ -1,7 +1,4 @@
 ﻿D:\forOber\OberGRT\Debug\Obj\GRT.pbd
-D:\forOber\OberGRT\Debug\Obj\ADC.pbi
-D:\forOber\OberGRT\Debug\Obj\GPIO.pbi
-D:\forOber\OberGRT\Debug\Obj\main.pbi
 D:\forOber\OberGRT\Debug\Obj\stm8s_adc1.pbi
 D:\forOber\OberGRT\Debug\Obj\stm8s_awu.pbi
 D:\forOber\OberGRT\Debug\Obj\stm8s_beep.pbi
@@ -20,3 +17,7 @@ D:\forOber\OberGRT\Debug\Obj\stm8s_tim2.pbi
 D:\forOber\OberGRT\Debug\Obj\stm8s_tim4.pbi
 D:\forOber\OberGRT\Debug\Obj\stm8s_uart1.pbi
 D:\forOber\OberGRT\Debug\Obj\stm8s_wwdg.pbi
+D:\forOber\OberGRT\Debug\Obj\ADC.pbi
+D:\forOber\OberGRT\Debug\Obj\AllThings.pbi
+D:\forOber\OberGRT\Debug\Obj\GPIO.pbi
+D:\forOber\OberGRT\Debug\Obj\main.pbi
