@@ -274,30 +274,10 @@ INTERRUPT_HANDLER(TIM1_CAP_COM_IRQHandler, 12)
   * @param  None
   * @retval None
   */
-uint16_t cntr_Wait_Oil = 0x00;
-uint8_t cntr_pump_period = 0x00;
-uint8_t cntr_start = 0x00;
-uint8_t cntr_LED = 0x00;
-uint8_t cntr_Check_CRASH_T10 = 0x00;
-uint8_t CRASH_SYSTEM = 0x00;
-uint8_t cntr_Wait_Presetting = 0x00;
+
  INTERRUPT_HANDLER(TIM2_UPD_OVF_BRK_IRQHandler, 13)
  {
-   IWDG_ReloadCounter();
-   if(cntr_Wait_Oil){cntr_Wait_Oil--;}
-   /// For timing the pump
-   if(cntr_pump_period){cntr_pump_period--;}
-   /// drebezg with T = 0.5;  
-   if(cntr_start){cntr_start--;}
-   /// LED with T = 1;  
-   if(cntr_LED){cntr_LED--;}
-   /// LED with T = 1;  
-   if(cntr_Check_CRASH_T10){cntr_Check_CRASH_T10--;}
-   /// Wait presettings
-   if(cntr_Wait_Presetting){cntr_Wait_Presetting--;}
-   /// Crash system timer;
-   if(CRASH_SYSTEM){CRASH_SYSTEM--;}
-   TIM2_ClearITPendingBit(TIM2_IT_UPDATE);
+   
  }
 
 /**
